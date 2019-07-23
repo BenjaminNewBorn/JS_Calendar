@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="weather.css">
+
+</head>
+<body>
+<div class="weather" id="weatherWidget">
+    <div class="weather-loc"></div>
+    <div class="weather-humidity"></div>
+    <div class="weather-temp"></div>
+    <img class="weather-tomorrow" />
+    <img class="weather-dayaftertomorrow" />
+</div>
+<form>
+    <input name="submit" type="button" value="send request" onclick="fetchWeather()">
+</form>
+
+<script>
+    function fetchWeather(){
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", " https://classes.engineering.wustl.edu/cse330/content/weather_json.php", true);
+        xmlHttp.addEventListener("load", function(event){
+            var jsonData = JSON.parse(event.target.responseText);
+
+            var loc = document.createElement("p")
+            var city = document.createElement("strong");
+            city.appendChild(document.createTextNode(jsonData.location.city));
+            loc.appendChild(city);
+            loc.appendChild(document.createTextNode(" " + jsonData.location.state));
+
+            var humidity = document.createTextNode(jsonData.atmosphere.humidity);
+            var temperature = document.createTextNode(jsonData.current.temp);
+            var tomorrow = "http://us.yimg.com/i/us/nws/weather/gr/" + jsonData.tomorrow.code + "ds.png";
+            var dayafter = "http://us.yimg.com/i/us/nws/weather/gr/" + jsonData.dayafter.code + "ds.png";
+
+            var locationObj =  document.getElementsByClassName("weather-loc")[0];
+            var humidityObj = document.getElementsByClassName("weather-humidity")[0];
+            var tempObj = document.getElementsByClassName("weather-temp")[0];
+            var tomorrowObj = document.getElementsByClassName("weather-tomorrow")[0];
+            var dayafterObj = document.getElementsByClassName("weather-dayaftertomorrow")[0];
+
+            if(locationObj.childElementCount == 0) {
+                locationObj.appendChild(loc);
+                humidityObj.appendChild(humidity);
+                tempObj.appendChild(temperature);
+                tomorrowObj.src = tomorrow;
+                dayafterObj.src = dayafter;
+            } else {
+                locationObj.replaceChild(loc, locationObj.lastChild);
+                humidityObj.replaceChild(humidity, humidityObj.lastChild);
+                tempObj.replaceChild(temperature, tempObj.lastChild);
+                tomorrowObj.src = tomorrow;
+                dayafterObj.src = dayafter;
+            }
+        }, false);
+        xmlHttp.send(null);
+    }
+    document.addEventListener("DOMContentLoaded", fetchWeather, false);
+</script>
+</body>
+</html>
